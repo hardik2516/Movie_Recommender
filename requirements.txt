@@ -1,0 +1,8 @@
+# Streamlit web app
+streamlit
+
+# Data manipulation
+pandas
+
+# Machine learning utilities
+scikit-learn
