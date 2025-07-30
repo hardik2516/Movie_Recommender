@@ -1,4 +1,3 @@
-# --- recommender.py ---
 import pandas as pd
 import ast
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -6,39 +5,21 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 def load_data_from_gdrive():
     """
-    Load dataset from Google Drive (public share link).
-    Combines cast, genres, keywords, and overview for hybrid similarity.
+    Load datasetCleaned.csv from Google Drive or local upload.
+    Only uses 'cast_clean' for similarity as the dataset lacks genres, keywords, and overview.
     """
-    drive_link = "https://drive.google.com/file/d/1dLEpQi4U0UOzEV0lenoy8iMRjeUydSJh/view?usp=sharing"
-    file_id = drive_link.split('/d/')[1].split('/')[0]
-    csv_url = f'https://drive.google.com/uc?id={file_id}'
-
     try:
-        df = pd.read_csv(csv_url)
+        df = pd.read_csv("datasetCleaned.csv")  # or provide full local path if needed
     except Exception as e:
         print(f"Error loading dataset: {e}")
         return pd.DataFrame()
 
-    # Parse dictionary-like columns
-    def parse_names(text):
-        try:
-            items = ast.literal_eval(str(text))
-            return " ".join(d['name'] for d in items if isinstance(d, dict) and 'name' in d)
-        except:
-            return ""
+    if 'cast_clean' not in df.columns or 'title' not in df.columns:
+        print("Missing required columns: 'cast_clean' or 'title'")
+        return pd.DataFrame()
 
-    df['cast_clean'] = df['cast'].apply(parse_names)
-    df['genres_clean'] = df['genres'].apply(parse_names) if 'genres' in df.columns else ''
-    df['keywords_clean'] = df['keywords'].apply(parse_names) if 'keywords' in df.columns else ''
-    df['overview_clean'] = df['overview'].astype(str)
-
-    df['combined_features'] = (
-        df['cast_clean'].fillna('') + " " +
-        df['genres_clean'].fillna('') + " " +
-        df['keywords_clean'].fillna('') + " " +
-        df['overview_clean'].fillna('')
-    )
-
+    # Use only available cleaned feature
+    df['combined_features'] = df['cast_clean'].fillna('')
     df = df[~df['title'].astype(str).str.startswith('#')]
     return df
 
