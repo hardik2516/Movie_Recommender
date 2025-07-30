@@ -1,18 +1,19 @@
 import streamlit as st
 from recommender import load_data_from_gdrive, compute_similarity_matrix, recommend
 
-# --- Streamlit UI ---
+# --- Page Config ---
 st.set_page_config(page_title="🎬 Movie Recommender", page_icon="🎬", layout="wide")
 
+# --- Header ---
 st.markdown('<h1 style="text-align:center; color:#FF4B4B;">🎬 Movie Recommendation System</h1>', unsafe_allow_html=True)
-st.markdown('<p style="text-align:center; color:#888;">Find movies similar to your favorite ones using cast, genre, and plot!</p>', unsafe_allow_html=True)
+st.markdown('<p style="text-align:center; color:#888;">Find similar movies based on cast similarity!</p>', unsafe_allow_html=True)
 st.markdown("---")
 
-# Load and prepare data
+# --- Load Dataset ---
 df = load_data_from_gdrive()
 
 if df.empty:
-    st.error("⚠️ Could not load data from Google Drive. Please check your link and file sharing permissions.")
+    st.error("⚠️ Could not load data. Please check your file or column names.")
 else:
     cosine_sim = compute_similarity_matrix(df)
 
@@ -27,7 +28,8 @@ else:
             for rec in recs:
                 st.markdown(f'🎬 {rec}')
         else:
-            st.warning(f"Could not find recommendations for '{selected_movie}'.")
+            st.warning(f"Sorry, no recommendations found for **{selected_movie}**.")
 
+# --- Footer ---
 st.markdown("---")
-st.caption("🚀 Built with Streamlit • Enhanced with genres, cast, and plot-based filtering.")
+st.caption("🚀 Built with Streamlit • Based on cast similarity only (limited dataset)")
